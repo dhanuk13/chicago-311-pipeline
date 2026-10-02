@@ -1,0 +1,42 @@
+name: Daily pothole pipeline
+
+on:
+  schedule:
+    - cron: "0 11 * * *"      # every day at 11:00 UTC (6 AM Chicago in summer, 5 AM in winter)
+  workflow_dispatch:          
+
+jobs:
+  run-pipeline:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install packages
+        run: pip install -r requirements.txt
+
+      - name: Restore database from previous run
+        uses: actions/cache@v5
+        with:
+          path: data/potholes.duckdb
+          key: duckdb-${{ github.run_id }}
+          restore-keys: duckdb-
+
+      - name: Extract and load
+        run: python ingest.py
+
+      - name: Transform and test
+        working-directory: pothole_dbt
+        run: dbt build
+
+      - name: Show results
+        working-directory: pothole_dbt
+        run: dbt show --select mart_community --limit 10
