@@ -1,0 +1,38 @@
+version: 2
+
+models:
+  - name: stg_phb
+    columns:
+      - name: sr_number
+        data_tests:
+          - unique
+          - not_null
+      - name: created_at
+        data_tests:
+          - not_null
+      - name: is_duplicate
+        data_tests:
+          - not_null
+
+  - name: stg_income
+    columns:
+      - name: community_area
+        data_tests:
+          - unique
+          - not_null
+
+  - name: int_phb
+    columns:
+      - name: community_area
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('stg_income')
+                field: community_area
+
+  - name: mart_community
+    columns:
+      - name: community_area
+        data_tests:
+          - unique
+          - not_null

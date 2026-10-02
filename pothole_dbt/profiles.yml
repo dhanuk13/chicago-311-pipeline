@@ -1,0 +1,7 @@
+pothole_dbt:
+  target: dev
+  outputs:
+    dev:
+      type: duckdb
+      path: ../data/potholes.duckdb
+      threads: 4
