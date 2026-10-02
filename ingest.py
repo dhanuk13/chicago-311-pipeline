@@ -4,6 +4,7 @@ from pathlib import Path
  
 import pandas as pd
 import requests
+import duckdb
  
 pd.set_option("display.max_columns", None)
  
@@ -55,3 +56,11 @@ with open("data/raw/phb_raw.json", "w") as f:
     json.dump(all_rows, f)
 
 print("Saved", len(all_rows), "rows to data/raw/phb_raw.json")
+
+con = duckdb.connect("data/potholes.duckdb")
+con.sql("""
+    CREATE OR REPLACE TABLE raw_phb AS
+    SELECT * FROM read_json_auto('data/raw/phb_raw.json')
+""")
+print(con.sql("SELECT COUNT(*) AS raw_rows FROM raw_phb"))
+con.close()
