@@ -2,8 +2,8 @@ name: Daily pothole pipeline
 
 on:
   schedule:
-    - cron: "0 11 * * *"      # every day at 11:00 UTC (6 AM Chicago in summer, 5 AM in winter)
-  workflow_dispatch:          
+    - cron: "0 11 * * *"      # every day at 11:00 UTC
+  workflow_dispatch:          # adds a "Run workflow" button for manual runs
 
 jobs:
   run-pipeline:
@@ -36,13 +36,13 @@ jobs:
       - name: Transform and test
         working-directory: pothole_dbt
         run: dbt build
-        
+
       - name: Export to Google Sheet
-           env:
-             GOOGLE_SA_KEY: ${{ secrets.GOOGLE_SA_KEY }}
-             SHEET_ID: ${{ secrets.SHEET_ID }}
-           run: python export_sheet.py
-           
+        env:
+          GOOGLE_SA_KEY: ${{ secrets.GOOGLE_SA_KEY }}
+          SHEET_ID: ${{ secrets.SHEET_ID }}
+        run: python export_sheet.py
+
       - name: Show results
         working-directory: pothole_dbt
         run: dbt show --select mart_community --limit 10
