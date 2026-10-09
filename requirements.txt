@@ -1,3 +1,4 @@
 requests
 duckdb
 dbt-duckdb
+gspread>=6
