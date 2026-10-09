@@ -36,7 +36,13 @@ jobs:
       - name: Transform and test
         working-directory: pothole_dbt
         run: dbt build
-
+        
+      - name: Export to Google Sheet
+           env:
+             GOOGLE_SA_KEY: ${{ secrets.GOOGLE_SA_KEY }}
+             SHEET_ID: ${{ secrets.SHEET_ID }}
+           run: python export_sheet.py
+           
       - name: Show results
         working-directory: pothole_dbt
         run: dbt show --select mart_community --limit 10
